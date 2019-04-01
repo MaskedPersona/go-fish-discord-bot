@@ -1,10 +1,9 @@
+const fs = require('fs');
 const Discord = require('discord.js');
 const config = require('./config.json');
 
 const client = new Discord.Client();
 
-// Gets a collection of all the commands in ./commands
-const fs = require('fs');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
@@ -14,19 +13,20 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
+// Creates a collection of cooldowns
 const cooldowns = new Discord.Collection();
+
 
 
 // Connect to Discord and set game status
 client.on('ready', () => {
   console.log("Connected as " + client.user.tag);
 });
-client.login(config.token).then(() => client.user.setActivity("Competitive Go Fish"));
 
 // Event listener for messages
 client.on('message', message => {
   // Prevent bot from responding to its own messages
-  if (message.author.bot || message.channel.type === "dm") return;
+  if (message.author.bot) return;
 
   // Checks for swe words
   if(swearCheck(message)) return;
@@ -59,22 +59,29 @@ client.on('message', message => {
     return message.channel.send(reply);
   }
 
+
+  // Adds cooldown from command to collection of cooldowns
   if (!cooldowns.has(command.name))
     cooldowns.set(command.name, new Discord.Collection());
-
+  // Gets the current time
   let now = Date.now();
+  // Sets timestamps to
   let timestamps = cooldowns.get(command.name);
-  let cooldownAmount = (command.cooldown || 2) * 1000;
+  let cooldownAmount = (command.cooldown) * 1000;
 
   if (timestamps.has(message.author.id)) {
     let expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
     if (now < expirationTime) {
-      const timeLeft = (expirationTime - now) / 1000;
-      return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+      let timeLeft = (expirationTime - now) / 1000;
+      return message.reply(`please wait ${timeLeft.toFixed(1)}` +
+          ` more second(s) before reusing the \`${command.name}\` command.`);
     }
   }
+  timestamps.set(message.author.id, now);
+  setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
+
+  // Actually executes command
   try {
     command.execute(message, args);
   } catch (error) {
@@ -140,12 +147,12 @@ function swearCheck(message) {
 
 // Checks and responds to the user if "anime" is found in the message
 function checkForAnime(message)  {
-  // If it doesn't find the word anime in the message, just return nothing
-  if (!message.toString().toLowerCase().includes("anime"))
+  // Exit if message or username doesn't contain the word anime
+  if (!(message.toString().toLowerCase().includes("anime") &&
+      message.author.name.toLowerCase().includes("anime")))
     return;
 
-  let reactEmoji = message.guild.emojis.find('name', 'NoAnimePenguin')
-    .catch(() => console.error("NoAnimePenguin emoji not found"));
+  let reactEmoji = message.guild.emojis.find('name', 'NoAnimePenguin');
   message.react(reactEmoji.id)
     .then(() => {
       console.log("Reacted to anime");
@@ -154,3 +161,7 @@ function checkForAnime(message)  {
           "\n!!!\t" + reactEmoji.toString());
     });
 }
+
+
+
+client.login(config.token).then(() => client.user.setActivity("Competitive Go Fish"));

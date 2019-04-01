@@ -1,9 +1,9 @@
 module.exports = {
-  name: 'pruneMessages',
+  name: 'prune',
   description: 'Deletes X[2,100] number of messages',
-  aliases: ['clear','delete'],
   args: true,
-  useage: '[messages]',
+  cooldown: 5,
+  usage: '[messages]',
   execute(message, args) {
     if (isNaN(args[0]))
       return message.channel.send("Please input a number");
@@ -11,10 +11,10 @@ module.exports = {
     if (args[0]<2 || args[0]>100)
       return message.channel.send("Number must be between 2 and 100");
 
-    return message.channel.bulkDelete(x, true)
+    return message.channel.bulkDelete(args[0], true)
         .then(() => {
           // Alert user that messages have been deleted then delete alert after 2 sec.
-          message.channel.send("Messages deleted! :smile:")
+          message.channel.send(`${args[0]} messages deleted! :smile:`)
               .then(msg => msg.delete(3000));
         })
         .catch(() => {

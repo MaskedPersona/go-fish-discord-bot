@@ -1,6 +1,6 @@
 {
   "name": "go-fish-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A discord bot written in JavaScript used on the official Discord server for Loveland, OH's Competitive Go Fish team",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/MaskedPersona/go-fish-discord-bot/issues"
   },
-  "homepage": "https://github.com/MaskedPersona/go-fish-discord-bot#readme"
+  "homepage": "https://github.com/MaskedPersona/go-fish-discord-bot#readme",
+  "dependencies": {
+    "discord.js": "latest"
+  }
 }
