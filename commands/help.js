@@ -3,11 +3,11 @@ const { prefix } = require('../config.json');
 module.exports = {
   name: 'help',
   description: 'List all of my commands or info about a specific command.',
-  cooldown: 5,
+  cooldown: 3,
   usage: '[command name]',
   execute(message, args) {
-    let data = [];
-    let {commands} = message.client;
+    const data = [];
+    const {commands} = message.client;
 
     if (!args.length) {
       data.push('Here\'s a list of all my commands:');
@@ -21,15 +21,15 @@ module.exports = {
           })
           .catch(error => {
             console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
-            message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
+            message.reply('It seems like I can\'t DM you! Do you have DMs disabled?');
           });
     }
 
-    let name = args[0].toLowerCase();
-    let command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+    const name = args[0].toLowerCase();
+    const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
     if (!command) {
-      return message.reply('that\'s not a valid command!');
+      return message.reply('That\'s not a valid command!');
     }
 
     data.push(`**Name:** ${command.name}`);

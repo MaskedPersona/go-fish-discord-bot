@@ -17,10 +17,10 @@ for (const file of commandFiles) {
 const cooldowns = new Discord.Collection();
 
 
-
 // Connect to Discord and set game status
 client.on('ready', () => {
   console.log("Connected as " + client.user.tag);
+  client.user.setActivity("Competitive Go Fish");
 });
 
 // Event listener for messages
@@ -39,8 +39,8 @@ client.on('message', message => {
     return;
 
 
-  let args = message.content.slice(config.prefix.length).split(/ +/);
-  let commandName = args.shift().toLowerCase();
+  const args = message.content.slice(config.prefix.length).split(/ +/);
+  const commandName = args.shift().toLowerCase();
 
   // Checks if command exists
   if (!client.commands.has(commandName)) return;
@@ -64,15 +64,15 @@ client.on('message', message => {
   if (!cooldowns.has(command.name))
     cooldowns.set(command.name, new Discord.Collection());
   // Gets the current time
-  let now = Date.now();
+  const now = Date.now();
   // Sets timestamps to
-  let timestamps = cooldowns.get(command.name);
-  let cooldownAmount = (command.cooldown) * 1000;
+  const timestamps = cooldowns.get(command.name);
+  const cooldownAmount = (command.cooldown) * 1000;
 
   if (timestamps.has(message.author.id)) {
     let expirationTime = timestamps.get(message.author.id) + cooldownAmount;
     if (now < expirationTime) {
-      let timeLeft = (expirationTime - now) / 1000;
+      const timeLeft = (expirationTime - now) / 1000;
       return message.reply(`please wait ${timeLeft.toFixed(1)}` +
           ` more second(s) before reusing the \`${command.name}\` command.`);
     }
@@ -86,13 +86,13 @@ client.on('message', message => {
     command.execute(message, args);
   } catch (error) {
     console.error(error);
-    message.reply('there was an error trying to execute that command!');
+    message.reply('There was an error trying to execute that command :cry:');
   }
 });
 
 // Checks for and deletes messages with swear words in them, returns true if found
 function swearCheck(message) {
-  let swearsList = [
+  const swearsList = [
     "anal",
     "anus",
     "arse",
@@ -134,7 +134,7 @@ function swearCheck(message) {
     "whore"
   ];
 
-  for (let swear of swearsList)
+  for (const swear of swearsList)
     if (message.toString().includes(swear)){
       if (Math.floor(Math.random() * 2) === 1)
         message.channel.send("NO SWEARING!! " + message.author.toString() + " 😡");
@@ -148,14 +148,13 @@ function swearCheck(message) {
 // Checks and responds to the user if "anime" is found in the message
 function checkForAnime(message)  {
   // Exit if message or username doesn't contain the word anime
-  if (!(message.toString().toLowerCase().includes("anime") &&
-      message.author.name.toLowerCase().includes("anime")))
+  if (!(message.toString().toLowerCase().includes("anime") ||
+      message.author.toString().toLowerCase().includes("anime")))
     return;
 
-  let reactEmoji = message.guild.emojis.find('name', 'NoAnimePenguin');
+  const reactEmoji = message.guild.emojis.find(emoji => emoji.name === 'NoAnimePenguin');
   message.react(reactEmoji.id)
     .then(() => {
-      console.log("Reacted to anime");
       message.channel.send("NO\t" + reactEmoji.toString() +
           "\nANIME\t" + reactEmoji.toString() +
           "\n!!!\t" + reactEmoji.toString());
@@ -163,5 +162,4 @@ function checkForAnime(message)  {
 }
 
 
-
-client.login(config.token).then(() => client.user.setActivity("Competitive Go Fish"));
+client.login(config.token);

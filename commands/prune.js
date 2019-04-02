@@ -2,7 +2,7 @@ module.exports = {
   name: 'prune',
   description: 'Deletes X[2,100] number of messages',
   args: true,
-  cooldown: 5,
+  cooldown: 1,
   usage: '[messages]',
   execute(message, args) {
     if (isNaN(args[0]))
